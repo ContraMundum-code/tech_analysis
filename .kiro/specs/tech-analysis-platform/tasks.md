@@ -1,0 +1,280 @@
+# Implementation Plan: 技术解析平台
+
+## Overview
+
+本实现计划将技术解析平台的设计分解为可执行的开发任务。采用前后端并行开发策略，先搭建基础架构，再逐步实现各功能模块。任务按照依赖关系排序，确保每个任务都能在前置任务完成后顺利执行。
+
+## Tasks
+
+- [x] 1. 项目初始化与基础架构搭建
+  - [x] 1.1 创建Spring Boot 3后端项目结构
+    - 使用Spring Initializr创建项目
+    - 配置Maven依赖（Spring Web, Security, MyBatis-Plus, MySQL, POI）
+    - 创建基础包结构（controller, service, repository, entity, dto, config, util）
+    - _Requirements: 12.1, 12.2_
+  - [x] 1.2 创建Vue 3前端项目结构
+    - 使用Vite创建Vue 3 + TypeScript项目
+    - 配置Tailwind CSS
+    - 安装ECharts、Pinia、Vue Router、Axios
+    - 创建基础目录结构（components, views, stores, api, utils）
+    - _Requirements: 5.1, 7.1_
+  - [x] 1.3 配置MySQL数据库
+    - 创建数据库和用户
+    - 编写数据库初始化脚本（建表语句）
+    - 配置MyBatis-Plus连接
+    - _Requirements: 3.1, 4.1_
+
+- [x] 2. 用户认证模块实现
+  - [x] 2.1 实现后端认证服务
+    - 创建User实体和Repository
+    - 实现JWT工具类（生成、验证、解析Token）
+    - 实现AuthService（登录、注册、验证）
+    - 创建AuthController（/api/auth/*）
+    - 配置Spring Security
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
+  - [ ]* 2.2 编写认证属性测试
+    - **Property 4: Authentication Correctness**
+    - **Validates: Requirements 1.2, 1.3**
+  - [ ]* 2.3 编写授权属性测试
+    - **Property 5: Authorization Enforcement**
+    - **Validates: Requirements 1.4**
+  - [x] 2.4 实现前端认证功能
+    - 创建user store（Pinia）
+    - 实现登录/注册页面组件
+    - 配置Axios拦截器（Token注入、401处理）
+    - 实现路由守卫
+    - _Requirements: 1.1, 1.2, 1.3_
+
+- [x] 3. Checkpoint - 认证模块验证
+  - 确保所有测试通过，如有问题请询问用户
+
+- [x] 4. 数据模型与序列化实现
+  - [x] 4.1 实现专利数据模型
+    - 创建Patent实体类
+    - 创建PatentRepository
+    - 实现JSON序列化/反序列化工具
+    - _Requirements: 3.1, 3.2, 3.3, 3.4_
+  - [ ]* 4.2 编写专利序列化属性测试
+    - **Property 1: Patent Serialization Round-Trip**
+    - **Validates: Requirements 3.3, 3.4, 3.5**
+  - [x] 4.3 实现项目数据模型
+    - 创建Project实体类
+    - 创建ProjectRepository
+    - 实现JSON序列化/反序列化
+    - _Requirements: 4.1, 4.2, 4.3, 4.4_
+  - [ ]* 4.4 编写项目序列化属性测试
+    - **Property 2: Project Serialization Round-Trip**
+    - **Validates: Requirements 4.3, 4.4, 4.5**
+  - [x] 4.5 实现论文和关键词数据模型
+    - 创建Paper实体类
+    - 创建Keyword实体类
+    - 创建关联表实体
+    - _Requirements: 3.2, 4.2_
+
+- [x] 5. 数据导入模块实现
+  - [x] 5.1 实现Excel解析服务
+    - 创建ExcelParser工具类
+    - 实现专利Excel解析逻辑
+    - 实现项目Excel解析逻辑
+    - 实现论文Excel解析逻辑
+    - 实现数据验证逻辑
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.8_
+  - [ ]* 5.2 编写Excel解析属性测试
+    - **Property 6: Excel Parsing Completeness**
+    - **Validates: Requirements 2.1, 2.2, 2.3**
+  - [ ]* 5.3 编写数据验证属性测试
+    - **Property 7: Data Validation Correctness**
+    - **Validates: Requirements 2.4**
+  - [x] 5.4 实现数据导入控制器
+    - 创建AdminController
+    - 实现文件上传接口
+    - 实现数据预览接口
+    - 实现确认导入接口
+    - _Requirements: 2.6, 2.7_
+  - [ ]* 5.5 编写数据持久化属性测试
+    - **Property 8: Data Import Persistence**
+    - **Validates: Requirements 2.7**
+  - [x] 5.6 实现前端数据导入界面
+    - 创建ExcelUploader组件
+    - 创建DataPreview组件
+    - 创建AdminDashboard页面
+    - 实现文件拖放上传
+    - 实现数据类型切换（专利/项目/论文）
+    - _Requirements: 2.1, 2.2, 2.3, 2.6_
+
+- [x] 6. Checkpoint - 数据导入模块验证
+  - 确保所有测试通过，如有问题请询问用户
+
+- [x] 7. 数据查询与搜索模块实现
+  - [x] 7.1 实现数据查询服务
+    - 创建PatentService（列表、详情、搜索）
+    - 创建ProjectService（列表、详情、搜索）
+    - 创建PaperService（列表、详情、搜索）
+    - 实现分页查询
+    - _Requirements: 11.1, 11.2_
+  - [x] 7.2 实现搜索与过滤功能
+    - 实现全文搜索
+    - 实现多条件过滤（国家、时间、分类、机构）
+    - 实现布尔运算符支持
+    - _Requirements: 11.1, 11.2, 11.3, 11.4_
+  - [ ]* 7.3 编写搜索结果属性测试
+    - **Property 15: Search Result Relevance**
+    - **Validates: Requirements 11.1**
+  - [ ]* 7.4 编写多过滤器属性测试
+    - **Property 16: Multi-Filter Conjunction**
+    - **Validates: Requirements 11.2**
+  - [x] 7.5 实现前端数据展示
+    - 创建DataTable组件
+    - 创建SearchBar组件
+    - 创建FilterPanel组件
+    - 实现搜索结果高亮
+    - _Requirements: 11.1, 11.3_
+
+- [x] 8. 技术图谱可视化模块实现
+  - [x] 8.1 实现技术图谱数据服务
+    - 创建AnalysisService
+    - 实现国家级技术分布数据聚合
+    - 实现数据类型切换逻辑
+    - _Requirements: 5.1, 5.3_
+  - [x] 8.2 实现前端世界地图组件
+    - 创建WorldMap.vue组件
+    - 配置ECharts geo组件
+    - 实现国家悬停tooltip
+    - 实现数据类型切换
+    - 实现缩放和平移
+    - _Requirements: 5.1, 5.2, 5.3, 5.5_
+  - [x] 8.3 实现国家详情面板
+    - 创建CountryDetail组件
+    - 实现ECharts柱状图
+    - 实现时间序列对比
+    - _Requirements: 5.4, 5.6_
+  - [ ]* 8.4 编写时间过滤属性测试
+    - **Property 11: Time-Based Filtering Correctness**
+    - **Validates: Requirements 7.2**
+  - [ ]* 8.5 编写国家过滤属性测试
+    - **Property 12: Country-Based Filtering Correctness**
+    - **Validates: Requirements 7.3**
+
+- [x] 9. Checkpoint - 技术图谱模块验证
+  - 确保所有测试通过，如有问题请询问用户
+
+- [x] 10. 竞争态势与趋势分析模块实现
+  - [x] 10.1 实现竞争态势分析服务
+    - 实现国家专利趋势聚合
+    - 实现机构排名计算
+    - 实现中国与主要国家对比
+    - 实现增长率计算
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
+  - [ ]* 10.2 编写增长率计算属性测试
+    - **Property 13: Growth Rate Calculation Correctness**
+    - **Validates: Requirements 6.5**
+  - [x] 10.3 实现趋势分析服务
+    - 实现时间序列数据聚合
+    - 实现热门技术排名
+    - 实现技术成熟度分类
+    - 实现区域分布统计
+    - _Requirements: 7.1, 7.4, 7.5, 7.6_
+  - [x] 10.4 实现前端趋势分析页面
+    - 创建TrendChart.vue组件（ECharts折线图）
+    - 创建RankingList.vue组件
+    - 创建MaturityChart.vue组件（ECharts饼图）
+    - 创建TrendAnalysis.vue页面
+    - 实现时间范围和国家筛选
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
+
+- [x] 11. 国内外技术对比模块实现
+  - [x] 11.1 实现技术对比服务
+    - 实现中国与其他国家对比数据聚合
+    - 实现优势领域识别算法
+    - 实现短板领域识别算法
+    - _Requirements: 8.1, 8.2, 8.3, 8.4_
+  - [ ]* 11.2 编写技术对比属性测试
+    - **Property 14: Technology Comparison Symmetry**
+    - **Validates: Requirements 8.3, 8.4**
+  - [x] 11.3 实现前端对比展示
+    - 创建ComparisonChart.vue组件
+    - 实现并排对比视图
+    - 实现优势/短板高亮显示
+    - _Requirements: 8.1, 8.5_
+
+- [x] 12. 三层技术关联图谱模块实现
+  - [x] 12.1 实现关联网络数据服务
+    - 实现三层节点数据构建
+    - 实现节点关联关系计算
+    - 实现分类过滤逻辑
+    - _Requirements: 10.1, 10.2, 10.4_
+  - [ ]* 12.2 编写网络图连通性属性测试
+    - **Property 18: Network Graph Connectivity**
+    - **Validates: Requirements 10.2**
+  - [x] 12.3 实现前端网络图组件
+    - 创建NetworkGraph.vue组件
+    - 配置ECharts graph组件
+    - 实现力导向布局
+    - 实现节点点击高亮
+    - 实现分类过滤
+    - 实现搜索定位
+    - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
+
+- [x] 13. Checkpoint - 分析模块验证
+  - 确保所有测试通过，如有问题请询问用户
+
+- [x] 14. 分析报告生成模块实现
+  - [x] 14.1 实现报告生成服务
+    - 创建ReportService
+    - 实现报告模板管理
+    - 集成LLM API（流式输出）
+    - 实现报告结构生成
+    - _Requirements: 9.1, 9.2, 9.3, 9.5_
+  - [ ]* 14.2 编写报告结构属性测试
+    - **Property 17: Report Structure Completeness**
+    - **Validates: Requirements 9.3**
+  - [x] 14.3 实现报告序列化
+    - 创建Report实体类
+    - 实现JSON序列化/反序列化
+    - 实现报告存储和检索
+    - _Requirements: 9.7, 9.8_
+  - [ ]* 14.4 编写报告序列化属性测试
+    - **Property 3: Report Serialization Round-Trip**
+    - **Validates: Requirements 9.7, 9.8**
+  - [x] 14.5 实现前端报告页面
+    - 创建ReportGenerator.vue组件
+    - 实现流式输出显示
+    - 创建ReportViewer.vue组件
+    - 实现报告下载功能
+    - _Requirements: 9.1, 9.4, 9.6_
+
+- [x] 15. 错误处理与系统健壮性
+  - [x] 15.1 实现全局错误处理
+    - 创建GlobalExceptionHandler
+    - 实现各类异常处理
+    - 实现错误日志记录
+    - _Requirements: 12.3, 12.5_
+  - [ ]* 15.2 编写错误处理属性测试
+    - **Property 19: Error Handling Graceful Degradation**
+    - **Validates: Requirements 12.3, 12.5**
+  - [x] 15.3 实现前端错误处理
+    - 配置全局错误拦截
+    - 实现用户友好错误提示
+    - 实现网络错误重试
+    - _Requirements: 12.3, 12.5_
+
+- [ ] 16. 字段完整性验证
+  - [ ]* 16.1 编写专利字段完整性属性测试
+    - **Property 9: Patent Field Completeness**
+    - **Validates: Requirements 3.1**
+  - [ ]* 16.2 编写项目字段完整性属性测试
+    - **Property 10: Project Field Completeness**
+    - **Validates: Requirements 4.1**
+
+- [x] 17. Final Checkpoint - 全系统集成验证
+  - 确保所有测试通过
+  - 验证前后端集成
+  - 如有问题请询问用户
+
+## Notes
+
+- 标记 `*` 的任务为可选测试任务，可根据时间安排跳过以加快MVP开发
+- 每个任务都引用了具体的需求编号以确保可追溯性
+- Checkpoint任务用于阶段性验证，确保增量开发的正确性
+- 属性测试验证通用正确性属性，单元测试验证具体示例和边界情况
+- 前后端任务可以并行开发，但需要在集成点进行同步
